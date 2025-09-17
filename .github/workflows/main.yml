@@ -7,24 +7,23 @@ on:
 
 jobs:
   build-windows:
-    # Uses GitHub-hosted Windows runner
+    # Uses GitHub-hosted Windows runner with Makefile
     if: ${{ true }}
     runs-on: windows-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
+      - name: Install Make
+        run: choco install make
 
-      - name: Build with MSBuild
-        run: msbuild sum_project.vcxproj
-
-      - name: Run Windows Tests
-        run: .\\Debug\\test_sum.exe
+      - name: Build and Test on Windows
+        run: |
+          make
+          test_sum.exe
 
   build-linux:
-    # Set to false to disable this job
+    # Linux build using Makefile
     if: ${{ true }}
     runs-on: ubuntu-latest
     steps:
@@ -37,7 +36,7 @@ jobs:
           ./test_sum
 
   build-custom:
-    # Set to false to disable this job
+    # Custom environment build using Makefile
     if: ${{ true }}
     runs-on: ubuntu-latest
     steps:
@@ -50,6 +49,7 @@ jobs:
           ./test_sum
 
   conan-publish:
+    # Only runs on master branch
     if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     steps:
