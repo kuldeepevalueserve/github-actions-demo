@@ -20,7 +20,7 @@ jobs:
       - name: Build and Test on Windows
         run: |
           make
-          test_sum.exe
+          ./test_sum.exe
 
   build-linux:
     # Linux build using Makefile
