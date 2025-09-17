@@ -12,7 +12,7 @@ env:
 
 jobs:
   build-windows:
-    if: env.ENABLE_WINDOWS == 'true'
+    if: ${{ github.event_name == 'push' && env.ENABLE_WINDOWS == 'true' }}
     runs-on: [self-hosted, windows]
     steps:
       - name: Checkout code
@@ -28,7 +28,7 @@ jobs:
         run: .\\Debug\\test_sum.exe
 
   build-linux:
-    if: env.ENABLE_LINUX == 'true'
+    if: ${{ github.event_name == 'push' && env.ENABLE_LINUX == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -40,7 +40,7 @@ jobs:
           ./test_sum
 
   build-custom:
-    if: env.ENABLE_CUSTOM == 'true'
+    if: ${{ github.event_name == 'push' && env.ENABLE_CUSTOM == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -52,7 +52,7 @@ jobs:
           ./test_sum
 
   conan-publish:
-    if: github.ref == 'refs/heads/master'
+    if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
