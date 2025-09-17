@@ -1,0 +1,66 @@
+name: C++ CI Pipeline
+
+on:
+  push:
+    branches:
+      - '*'
+
+env:
+  ENABLE_WINDOWS: true
+  ENABLE_LINUX: true
+  ENABLE_CUSTOM: true
+
+jobs:
+  build-windows:
+    if: env.ENABLE_WINDOWS == 'true'
+    runs-on: [self-hosted, windows]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Build with MSBuild
+        run: msbuild sum_project.vcxproj
+
+      - name: Run Windows Tests
+        run: .\\Debug\\test_sum.exe
+
+  build-linux:
+    if: env.ENABLE_LINUX == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Build and Test on Linux
+        run: |
+          make
+          ./test_sum
+
+  build-custom:
+    if: env.ENABLE_CUSTOM == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Custom Environment Build and Test
+        run: |
+          make
+          ./test_sum
+
+  conan-publish:
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Conan
+        run: pip install conan
+
+      - name: Export and Upload Conan Package
+        run: |
+          conan export . sum_project/1.0@
