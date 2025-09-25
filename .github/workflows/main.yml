@@ -8,14 +8,11 @@ on:
 env:
   BUILD_TYPE: Release
   CONAN_USER_HOME: ${{ github.workspace }}/.conan
-  ENABLE_WINDOWS: true
-  ENABLE_LINUX: true
-  ENABLE_CUSTOM: false
 
 jobs:
   build-windows:
     runs-on: windows-latest
-    if: ${{ env.ENABLE_WINDOWS == 'true' }}
+    if: ${{ true }}
     env:
       OS_NAME: windows
     steps:
@@ -32,7 +29,7 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    if: ${{ env.ENABLE_LINUX == 'true' }}
+    if: ${{ true }}
     env:
       OS_NAME: linux
     steps:
@@ -46,7 +43,7 @@ jobs:
 
   build-custom:
     runs-on: ubuntu-latest
-    if: ${{ env.ENABLE_CUSTOM == 'true' }}
+    if: ${{ true }}
     env:
       OS_NAME: custom-linux
     needs: [build-linux]
@@ -62,7 +59,7 @@ jobs:
   conan-publish:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/master' }}
-    needs: [build-windows, build-linux]
+    needs: [build-windows, build-linux, build-custom]
     env:
       OS_NAME: publish
     steps:
