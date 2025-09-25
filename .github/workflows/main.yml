@@ -5,11 +5,16 @@ on:
     branches:
       - '*'
 
+env:
+  BUILD_TYPE: Release
+  CONAN_USER_HOME: ${{ github.workspace }}/.conan
+
 jobs:
   build-windows:
-    # Uses GitHub-hosted Windows runner with Makefile
-    if: ${{ true }}
     runs-on: windows-latest
+    if: ${{ true }}
+    env:
+      OS_NAME: windows
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -23,9 +28,10 @@ jobs:
           ./test_sum.exe
 
   build-linux:
-    # Linux build using Makefile
-    if: ${{ true }}
     runs-on: ubuntu-latest
+    if: ${{ true }}
+    env:
+      OS_NAME: linux
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -36,9 +42,11 @@ jobs:
           ./test_sum
 
   build-custom:
-    # Custom environment build using Makefile
-    if: ${{ true }}
     runs-on: ubuntu-latest
+    if: ${{ true }}
+    env:
+      OS_NAME: custom-linux
+    needs: [build-linux]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -49,9 +57,11 @@ jobs:
           ./test_sum
 
   conan-publish:
-    # Only runs on master branch
-    if: ${{ github.ref == 'refs/heads/master' }}
     runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/master' }}
+    needs: [build-windows, build-linux, build-custom]
+    env:
+      OS_NAME: publish
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
